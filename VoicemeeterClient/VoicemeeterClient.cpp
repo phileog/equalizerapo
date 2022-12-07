@@ -258,13 +258,19 @@ void VoicemeeterClient::detectVoicemeeterType()
 	{
 		connected = true;
 
-		unsigned outputCount;
-		if (vmType == 3)
+		unsigned outputCount, virtOutputCount;
+		if (vmType == 3) {
 			outputCount = 5;
-		else if (vmType == 2)
+			virtOutputCount = 3;
+		}
+		else if (vmType == 2) {
 			outputCount = 3;
-		else
+			virtOutputCount = 2;
+		}
+		else {
 			outputCount = 1;
+			virtOutputCount = 1;
+		}
 
 		if (outputCount != engines.size())
 		{
@@ -274,10 +280,12 @@ void VoicemeeterClient::detectVoicemeeterType()
 					delete engine;
 			engines.clear();
 
-			for (unsigned i = 0; i < outputCount; i++)
+			for (unsigned i = 0; i < outputCount + virtOutputCount; i++)
 			{
 				wstringstream sstream;
-				sstream << "Output A" << (i + 1);
+				wstring trackName = i < outputCount ? L"A" : L"B";
+				unsigned index = i < outputCount ? i : i - outputCount;
+				sstream << "Output " << trackName << (index + 1);
 				wstring output = sstream.str();
 				if (find(outputs.begin(), outputs.end(), output) != outputs.end())
 				{
