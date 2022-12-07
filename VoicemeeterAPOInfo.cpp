@@ -65,13 +65,19 @@ void VoicemeeterAPOInfo::prependInfos(vector<shared_ptr<AbstractAPOInfo>>& list)
 		else if (setupFilename == L"Voicemeeter8Setup.exe")
 			voicemeeterType = 3;// potato
 
-		unsigned outputCount;
-		if (voicemeeterType == 3)
+		unsigned outputCount, virtOutputCount;
+		if (voicemeeterType == 3) {
 			outputCount = 5;
-		else if (voicemeeterType == 2)
+			virtOutputCount = 3;
+		}
+		else if (voicemeeterType == 2) {
 			outputCount = 3;
-		else
+			virtOutputCount = 2;
+		}
+		else {
 			outputCount = 1;
+			virtOutputCount = 1;
+		}
 
 		bool defaultDevice = false;
 		list.erase(remove_if(list.begin(), list.end(), [&defaultDevice](shared_ptr<AbstractAPOInfo>& info) {
@@ -87,10 +93,12 @@ void VoicemeeterAPOInfo::prependInfos(vector<shared_ptr<AbstractAPOInfo>>& list)
 		}), list.end());
 
 		bool anyInstalled = false;
-		for (unsigned i = 0; i < outputCount; i++)
+		for (unsigned i = 0; i < outputCount + virtOutputCount; i++)
 		{
 			wstringstream sstream;
-			sstream << "Output A" << (i + 1);
+			wstring trackName = i < outputCount ? L"A" : L"B";
+			unsigned index = i < outputCount ? i : i - outputCount;
+			sstream << "Output " << trackName << (index + 1);
 			shared_ptr<AbstractAPOInfo> info = *list.insert(list.begin() + i, make_shared<VoicemeeterAPOInfo>(sstream.str(), true));
 			if (info->isInstalled())
 				anyInstalled = true;
